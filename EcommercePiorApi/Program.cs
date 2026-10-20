@@ -1,9 +1,13 @@
+using Ecommerce.Data;
+using Ecommerce.Model;
+using Ecommerce.Services;
 using Microsoft.EntityFrameworkCore;
 using PiorEcommerceDoMundo;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+ 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     // gambiarra pra nao quebrar quando serializar Pedido -> Itens -> Pedido (referencia ciclica)
@@ -11,6 +15,13 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite("Data Source=ecommerce.db"));
+
+builder.Services.AddScoped<IPedidoService, PedidoService>();
+//CORREÇÃO: Registra o novo serviço de pagamento no container de injeção de dependência
+builder.Services.AddScoped<IPagamentoService, PagamentoService>();
 
 var app = builder.Build();
 
